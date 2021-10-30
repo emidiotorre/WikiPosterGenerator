@@ -13,7 +13,7 @@ import {
 import fontRegular from "./assets/PPObjectSans-Regular.otf";
 import fontHeavy from "./assets/PPObjectSans-Heavy.otf";
 import fontHeavySlanted from "./assets/PPObjectSans-HeavySlanted.otf";
-
+import { prominent } from 'color.js';
 export const handler = ({ inputs, mechanic, sketch }) => {
 
   const { width, height, dates, url, image, color } =
@@ -22,7 +22,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   let descriptionText = "";
   const datesText = dates.toUpperCase();
   const urlText = url.split('https://it.wikipedia.org/wiki/')[1];
-
+  let prominentColor = "";
   let artistElement;
   let datesElement;
   let titleElement;
@@ -335,6 +335,12 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       if (content.originalimage) {
         sketch.loadImage(content.originalimage.source,(data)=>{
           img = data;
+          
+
+prominent(content.originalimage.source, { amount: 1, format: 'hex' }).then(color => {
+  prominentColor = color
+})
+
           loadImageAndAddFilter();
         });
       }
@@ -352,29 +358,36 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   // function to change initial x co-ordinate of the line
 function x1(t){
-  return sin(t/10)*125+sin(t/20)*125+sin(t/30)*125;
+  return Math.sin(t/10)*125+Math.sin(t/20)*125+Math.sin(t/30)*125;
 }
 
 // function to change initial y co-ordinate of the line
 function y1(t){
-  return cos(t/10)*125+cos(t/20)*125+cos(t/30)*125;
+  return Math.cos(t/10)*125+Math.cos(t/20)*125+Math.cos(t/30)*125;
 }
 
 // function to change final x co-ordinate of the line
 function x2(t){
-  return sin(t/15)*125+sin(t/25)*125+sin(t/35)*125;
+  return Math.sin(t/15)*125+Math.sin(t/25)*125+Math.sin(t/35)*125;
 }
 
 // function to change final y co-ordinate of the line
 function y2(t){
-  return cos(t/15)*125+cos(t/25)*125+cos(t/35)*125;
+  return Math.cos(t/15)*125+Math.cos(t/25)*125+Math.cos(t/35)*125;
 }
 
   sketch.draw = () => {
 
     
     if(titleText != "" && descriptionText != "" ){
-      console.log('DRAW!!!')
+      /* sketch.translate(width/2,height/2); */
+      sketch.background(prominentColor);
+      sketch.stroke('#0f0f0f');
+      sketch.strokeWeight(1.5);
+      //loop for adding 100 lines
+      for(let i = 0;i<10;i++){
+        sketch.line(x1(t+i),y1(t+i),x2(t+i)+2,y2(t+i)+2);
+      }
 /*       setStylingBase();
 
       drawGrid(); */
@@ -391,14 +404,7 @@ function y2(t){
       removeRowsUsedByElement(availableRows, datesElement);
       drawRectangles();
 
-      translate(width/2,height/2);
-      background('#fff');
-      stroke('#0f0f0f');
-      strokeWeight(1.5);
-      //loop for adding 100 lines
-      for(let i = 0;i<10;i++){
-        line(x1(t+i),y1(t+i),x2(t+i)+2,y2(t+i)+2);
-      }
+      
       t+=0.15;
       
       

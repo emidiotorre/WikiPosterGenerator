@@ -12,6 +12,7 @@
     "@mechanic-design/cli": "^1.1.0"
   },
   "dependencies": {
-    "@mechanic-design/engine-p5": "^1.1.0"
+    "@mechanic-design/engine-p5": "^1.1.0",
+    "color.js": "^1.2.0"
   }
 }
