@@ -16,7 +16,7 @@ import fontHeavySlanted from "./assets/PPObjectSans-HeavySlanted.otf";
 import { prominent } from 'color.js';
 export const handler = ({ inputs, mechanic, sketch }) => {
 
-  const { width, height, dates, url, image, color } =
+  const { width, height, dates, url, image, color, x, y } =
     inputs;
   let titleText = "";
   let descriptionText = "";
@@ -29,7 +29,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   let t = 5;
 
-  const rows = 32;
+  const rows = 42;
   const separation = height / rows;
   const availableRows = Array.from({ length: rows }, (_, k) => k);
 
@@ -67,11 +67,13 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   const drawArtistElement = () => {
     const element = {};
-    element.baseRowSize = randInt(3, 6);
+    element.baseRowSize = randInt(2, 3);
     element.baseSize = element.baseRowSize * separation;
 
+    sketch.fill(prominentColor);
+    
     const words = descriptionText.split(" ");
-    sketch.textSize(element.baseSize * 0.8);
+    sketch.textSize(element.baseSize * 0.5);
     sketch.textFont(objSansHeavySlanted);
     const lengths = words.map((t) => sketch.textWidth(t));
     element.length = Math.max(width / 3, ...lengths) + width / 20;
@@ -105,8 +107,9 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   const drawTitleElement = () => {
     const element = {};
-    element.baseRowSize = 2;
+    element.baseRowSize = 3;
     element.baseSize = element.baseRowSize * separation;
+    sketch.fill(prominentColor);
 
     sketch.textSize(element.baseSize);
     sketch.textStyle(sketch.NORMAL);
@@ -224,7 +227,12 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
     return element;
   };
-
+  const drawBackground = () => {
+    sketch.background(y / 2, 100, 100);
+  
+    sketch.fill(360 - y / 2, 100, 100);
+    sketch.rect(360, 360, x + 1, x + 1);
+  }
   const drawRectangle = ({ rx, ry, rw, rh }) => {
     if (img) {
       const rectRatio = rw / rh;
@@ -353,7 +361,14 @@ prominent(content.originalimage.source, { amount: 1, format: 'hex' }).then(color
   };
   
   sketch.setup = () => {
+    
     sketch.createCanvas(width, height);
+    
+    sketch.noCursor();
+  
+    sketch.colorMode(sketch.HSB,10,100);
+    sketch.rectMode(sketch.CENTER);
+    sketch.noStroke();
   };
 
   // function to change initial x co-ordinate of the line
@@ -380,14 +395,10 @@ function y2(t){
 
     
     if(titleText != "" && descriptionText != "" ){
-      /* sketch.translate(width/2,height/2); */
-      sketch.background(prominentColor);
-      sketch.stroke('#0f0f0f');
-      sketch.strokeWeight(1.5);
-      //loop for adding 100 lines
-      for(let i = 0;i<10;i++){
-        sketch.line(x1(t+i),y1(t+i),x2(t+i)+2,y2(t+i)+2);
-      }
+      //sketch.background(prominentColor);
+      drawBackground();
+      
+  
 /*       setStylingBase();
 
       drawGrid(); */
@@ -397,7 +408,6 @@ function y2(t){
       removeRowsUsedByElement(availableRows, artistElement);
 
       titleElement = drawTitleElement();
-
       datesElement = drawDatesElement();
 
       removeRowsUsedByElement(availableRows, titleElement);
@@ -417,7 +427,7 @@ function y2(t){
 export const inputs = {
   dates: {
     type: "text",
-    default: "Sept 9 – Oct 30, 2021",
+    default: "",
   },
   url: {
     type: "text",
@@ -441,6 +451,23 @@ export const inputs = {
     default: 600,
     editable: false,
   },
+  x: {
+    type: "number", 
+    min: 0, 
+    max: 500, 
+    step: 5, 
+    slider: true, 
+    default: 400 
+  },
+  y: {
+    type: "number", 
+    min: 0, 
+    max: 500, 
+    step: 5, 
+    slider: true, 
+    default: 400 
+  },
+
 };
 
 export const presets = {
