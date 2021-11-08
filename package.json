@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@mechanic-design/engine-p5": "^1.1.0",
-    "color.js": "^1.2.0"
+    "color.js": "^1.2.0",
+    "qrcode": "^1.4.4"
   }
 }

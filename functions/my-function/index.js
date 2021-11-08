@@ -13,11 +13,28 @@ import {
 import fontRegular from "./assets/PPObjectSans-Regular.otf";
 import fontHeavy from "./assets/PPObjectSans-Heavy.otf";
 import fontHeavySlanted from "./assets/PPObjectSans-HeavySlanted.otf";
+import freak from "./assets/FREAKGrotesk-next-BOLD.otf";
 import { prominent } from 'color.js';
+import QRCode from 'qrcode';
+
 export const handler = ({ inputs, mechanic, sketch }) => {
 
-  const { width, height, dates, url, image, color, x, y } =
+  const { 
+    width, 
+    height, 
+    dates, 
+    url, 
+    image, 
+    color, 
+    textColor, 
+    fattoreRettangoli, 
+    numeroRettangoli, 
+    background, 
+    extractBackgroundFromImage, 
+    fontUrl,
+    fontName } =
     inputs;
+
   let titleText = "";
   let descriptionText = "";
   const datesText = dates.toUpperCase();
@@ -34,20 +51,12 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   const availableRows = Array.from({ length: rows }, (_, k) => k);
 
   let img;
+  let qr;
   let imgGraphic;
-  let objSansRegular;
-  let objSansHeavy;
-  let objSansHeavySlanted;
+  let qrGraphic;
 
-  const loadImageAndAddFilter = () => {
-    imgGraphic = sketch.createGraphics(img.width, img.height);
-    imgGraphic.image(img, 0, 0);
-/*     imgGraphic.filter(imgGraphic.GRAY);
-    imgGraphic.blendMode(imgGraphic.MULTIPLY);
-    imgGraphic.noStroke();
-    imgGraphic.fill(color);
-    imgGraphic.rect(0, 0, img.width, img.height);
-    imgGraphic.blendMode(imgGraphic.BLEND); */
+  const loadQR = () => {
+    console.log(qr);
   };
 
   const drawGrid = () => {
@@ -62,7 +71,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     sketch.background("white");
     sketch.stroke(color);
     sketch.fill(color);
-    sketch.textFont(objSansRegular);
+    sketch.textFont(fontName);
   };
 
   const drawArtistElement = () => {
@@ -70,11 +79,11 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     element.baseRowSize = randInt(2, 3);
     element.baseSize = element.baseRowSize * separation;
 
-    sketch.fill(prominentColor);
+    sketch.fill(textColor);
     
     const words = descriptionText.split(" ");
     sketch.textSize(element.baseSize * 0.5);
-    sketch.textFont(objSansHeavySlanted);
+    sketch.textFont(fontName);
     const lengths = words.map((t) => sketch.textWidth(t));
     element.length = Math.max(width / 3, ...lengths) + width / 20;
 
@@ -112,7 +121,6 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     sketch.fill(prominentColor);
 
     sketch.textSize(element.baseSize);
-    sketch.textStyle(sketch.NORMAL);
     element.length = sketch.textWidth(titleText) + width / 20;
 
     element.startRow = choice(
@@ -130,20 +138,19 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   const drawDatesElement = () => {
     const element = {};
-    element.isSingleRow = flipCoin();
-    element.baseRowSize = 1;
+    element.isSingleRow = false
+    element.baseRowSize = 2;
     element.baseSize = element.baseRowSize * separation;
 
     sketch.textSize(element.baseSize * 0.8);
-    sketch.textFont(objSansHeavy);
+    sketch.textFont(fontName);
     const minLength =
       (element.isSingleRow
         ? sketch.textWidth(datesText) +
-          width / 20 +
-          sketch.textWidth(urlText)
+          width / 20 
         : Math.max(
             sketch.textWidth(datesText),
-            sketch.textWidth(urlText)
+            sketch.textWidth(descriptionText)
           )) +
       width / 20;
 
@@ -179,13 +186,13 @@ export const handler = ({ inputs, mechanic, sketch }) => {
             leftWidth / 2,
             sketch.textWidth(datesText) +
               element.midDistance +
-              sketch.textWidth(urlText)
+              sketch.textWidth(descriptionText)
           )
         : Math.max(
             leftWidth / 4,
             Math.max(
               sketch.textWidth(datesText),
-              sketch.textWidth(urlText)
+              sketch.textWidth(descriptionText)
             )
           )) +
       leftWidth / 20;
@@ -194,9 +201,10 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       (flipCoin() ? 0 : randInt(0, Math.floor(leftWidth - element.length)));
     element.x2 = element.x1 + element.length;
 
-    const [first, second] = flipCoin()
-      ? [datesText, urlText]
-      : [urlText, datesText];
+/*     const [first, second] = flipCoin()
+      ? [datesText, descriptionText]
+      : [descriptionText, datesText]; */
+    const [first, second] = [descriptionText, descriptionText];
 
     if (element.isSingleRow) {
       sketch.text(first, element.x1, element.y + element.baseSize);
@@ -217,8 +225,13 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       );
       sketch.text(
         second,
-        alignDateRight ? element.x2 - leftWidth / 20 : element.x1,
+        element.x2 - width,
         element.y + 2 * element.baseSize
+      );
+      sketch.text(
+        second,
+        element.x2 - width * 2,
+        element.y + 3 * element.baseSize
       );
       if (alignDateRight) {
         sketch.textAlign(sketch.LEFT);
@@ -228,10 +241,13 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     return element;
   };
   const drawBackground = () => {
-    sketch.background(y / 2, 100, 100);
+    let bgCol = extractBackgroundFromImage ? prominentColor : background
+    sketch.background( bgCol );
   
-    sketch.fill(360 - y / 2, 100, 100);
-    sketch.rect(360, 360, x + 1, x + 1);
+    sketch.fill(color);
+    for(let i=0; i<numeroRettangoli; i++){
+      sketch.rect(randInt(0,Math.floor(width)),randInt(0,Math.floor(width)), randInt(0,Math.floor(fattoreRettangoli*100)) + 1, randInt(0,Math.floor(fattoreRettangoli) + 1));
+    }
   }
   const drawRectangle = ({ rx, ry, rw, rh }) => {
     if (img) {
@@ -326,9 +342,15 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     }
   };
 
-  sketch.preload = () => {
+  sketch.preload = async () => {
 
-    fetch('https://it.wikipedia.org/api/rest_v1/page/summary/'+urlText)
+    const head = sketch._userNode.parentNode.parentNode.children[0];
+    console.log(head.innerHTML)
+    head.innerHTML = head.innerHTML + '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="'+fontUrl+'" rel="stylesheet">';
+
+
+
+    return await fetch('https://it.wikipedia.org/api/rest_v1/page/summary/'+urlText)
     .then(function(response){
       var content = response.json()
       return content;
@@ -336,35 +358,50 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     .then(function(content){
       console.log(content)
         titleText = content.title;
-        descriptionText = content.description;
+        descriptionText = content.extract;
         return content;
     })
-    .then((content)=>{
+    .then(async (content)=>{
       if (content.originalimage) {
-        sketch.loadImage(content.originalimage.source,(data)=>{
+         await sketch.loadImage(content.originalimage.source,(data)=>{
           img = data;
-          
-
-prominent(content.originalimage.source, { amount: 1, format: 'hex' }).then(color => {
-  prominentColor = color
-})
-
-          loadImageAndAddFilter();
+          imgGraphic = sketch.createGraphics(img.width, img.height);
+          imgGraphic.image(img, 0, 0);
         });
+        return content.originalimage.source;
+      }else{
+        return null;
       }
+    })
+    .then(async (src)=>{
+      await prominent(src, { amount: 1, format: 'hex' }).then(color => {
+        prominentColor = color;
+      })
+      return prominentColor;
+    })
+    .then(async (prominentColor)=>{
+      let bgCol = extractBackgroundFromImage ? prominentColor : background;
+      return await QRCode.toDataURL(url,{
+          color: {
+            dark:textColor,
+            light: bgCol
+          },
+          width: 30,
+          height: 30,
+          scale: 1
+      })
+      .then(qrData => {
+        qr = qrData;
+        return qrData;
+      });
     })
     
     
-    objSansRegular = sketch.loadFont(fontRegular);
-    objSansHeavy = sketch.loadFont(fontHeavy);
-    objSansHeavySlanted = sketch.loadFont(fontHeavySlanted);
   };
   
   sketch.setup = () => {
     
     sketch.createCanvas(width, height);
-    
-    sketch.noCursor();
   
     sketch.colorMode(sketch.HSB,10,100);
     sketch.rectMode(sketch.CENTER);
@@ -396,6 +433,7 @@ function y2(t){
     
     if(titleText != "" && descriptionText != "" ){
       //sketch.background(prominentColor);
+
       drawBackground();
       
   
@@ -403,18 +441,21 @@ function y2(t){
 
       drawGrid(); */
 
+      
       artistElement = drawArtistElement();
-
-      removeRowsUsedByElement(availableRows, artistElement);
-
       titleElement = drawTitleElement();
       datesElement = drawDatesElement();
-
+      
+      removeRowsUsedByElement(availableRows, artistElement);
       removeRowsUsedByElement(availableRows, titleElement);
       removeRowsUsedByElement(availableRows, datesElement);
+      
       drawRectangles();
 
-      
+      sketch.loadImage(qr,(qrd)=>{
+        sketch.image(qrd,width - qrd.width,height - qrd.height);
+      });
+
       t+=0.15;
       
       
@@ -433,10 +474,23 @@ export const inputs = {
     type: "text",
     default: "",
   },
+  fontUrl: {
+    type: "text",
+    default: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&display=swap",
+  },
+  fontName: {
+    type: "text",
+    default: "Space Grotesk",
+  },
   image: {
     type: "image",
   },
   color: {
+    type: "color",
+    default: "#E94225",
+    model: "hex",
+  },
+  textColor: {
     type: "color",
     default: "#E94225",
     model: "hex",
@@ -451,7 +505,7 @@ export const inputs = {
     default: 600,
     editable: false,
   },
-  x: {
+  fattoreRettangoli: {
     type: "number", 
     min: 0, 
     max: 500, 
@@ -459,13 +513,22 @@ export const inputs = {
     slider: true, 
     default: 400 
   },
-  y: {
+  numeroRettangoli: {
     type: "number", 
     min: 0, 
-    max: 500, 
+    max: 100, 
     step: 5, 
     slider: true, 
     default: 400 
+  },
+  extractBackgroundFromImage: {
+    type: "boolean",
+    default: false
+  },
+  background: {
+    type: "color",
+    default: "#E94225",
+    model: "hex",
   },
 
 };
