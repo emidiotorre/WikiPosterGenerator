@@ -22,7 +22,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   const { 
     width, 
     height, 
-    dates, 
+    testo, 
     url, 
     image, 
     color, 
@@ -37,11 +37,11 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   let titleText = "";
   let descriptionText = "";
-  const datesText = dates.toUpperCase();
+  const testoText = testo.toUpperCase();
   const urlText = url.split('https://it.wikipedia.org/wiki/')[1];
   let prominentColor = "";
   let artistElement;
-  let datesElement;
+  let testoElement;
   let titleElement;
 
   let t = 5;
@@ -118,7 +118,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     const element = {};
     element.baseRowSize = 3;
     element.baseSize = element.baseRowSize * separation;
-    sketch.fill(prominentColor);
+    sketch.fill(textColor);
 
     sketch.textSize(element.baseSize);
     element.length = sketch.textWidth(titleText) + width / 20;
@@ -136,20 +136,20 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     return element;
   };
 
-  const drawDatesElement = () => {
+  const drawtestoElement = () => {
     const element = {};
     element.isSingleRow = false
     element.baseRowSize = 2;
     element.baseSize = element.baseRowSize * separation;
-
+    sketch.fill(textColor);
     sketch.textSize(element.baseSize * 0.8);
     sketch.textFont(fontName);
     const minLength =
       (element.isSingleRow
-        ? sketch.textWidth(datesText) +
+        ? sketch.textWidth(testoText) +
           width / 20 
         : Math.max(
-            sketch.textWidth(datesText),
+            sketch.textWidth(testoText),
             sketch.textWidth(descriptionText)
           )) +
       width / 20;
@@ -184,14 +184,14 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       (element.isSingleRow
         ? Math.max(
             leftWidth / 2,
-            sketch.textWidth(datesText) +
+            sketch.textWidth(testoText) +
               element.midDistance +
               sketch.textWidth(descriptionText)
           )
         : Math.max(
             leftWidth / 4,
             Math.max(
-              sketch.textWidth(datesText),
+              sketch.textWidth(testoText),
               sketch.textWidth(descriptionText)
             )
           )) +
@@ -202,8 +202,8 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     element.x2 = element.x1 + element.length;
 
 /*     const [first, second] = flipCoin()
-      ? [datesText, descriptionText]
-      : [descriptionText, datesText]; */
+      ? [testoText, descriptionText]
+      : [descriptionText, testoText]; */
     const [first, second] = [descriptionText, descriptionText];
 
     if (element.isSingleRow) {
@@ -273,7 +273,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     const maxUsedSpace = Math.max(
       artistElement.x2,
       titleElement.x2,
-      datesElement.x2
+      testoElement.x2
     );
     const canThereBeTwoColumns = width - maxUsedSpace > width / 4 + width / 20;
     const columnLength = width / 4;
@@ -282,7 +282,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       bigColumnDrawn = true;
     }
 
-    const elementRows = getRowsFromElements([titleElement, datesElement]);
+    const elementRows = getRowsFromElements([titleElement, testoElement]);
     const usedSections = getSections(elementRows, 3);
     const freeSections = getSections(availableRows, 3);
     const sections = [
@@ -304,7 +304,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
           startRow: row,
           endRow: row + rowLength - 1,
         },
-        [titleElement, datesElement]
+        [titleElement, testoElement]
       );
       const leftWidth = width - offset;
       const rectY = row * separation;
@@ -364,11 +364,14 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     })
     .then(async (content)=>{
       if (content.originalimage) {
-        await sketch.loadImage(content.originalimage.source,(data)=>{
-          img = data;
-          imgGraphic = sketch.createGraphics(img.width, img.height);
-          imgGraphic.image(img, 0, 0);
-        });
+        await new Promise(resolve => setTimeout(()=>{
+          sketch.loadImage(content.originalimage.source, (data)=>{
+            img = data;
+            imgGraphic = sketch.createGraphics(img.width, img.height);
+           imgGraphic.image(img, 0, 0);
+           resolve()
+          });
+        }, 0));
         return content.originalimage.source;
       }else{
         return null;
@@ -376,6 +379,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     })
     .then(async (src)=>{
       if( src != null ){
+
         await prominent(src, { amount: 1, format: 'hex' }).then(color => {
           prominentColor = color;
         })
@@ -449,11 +453,11 @@ function y2(t){
       
       artistElement = drawArtistElement();
       titleElement = drawTitleElement();
-      datesElement = drawDatesElement();
+      testoElement = drawtestoElement();
       
       removeRowsUsedByElement(availableRows, artistElement);
       removeRowsUsedByElement(availableRows, titleElement);
-      removeRowsUsedByElement(availableRows, datesElement);
+      removeRowsUsedByElement(availableRows, testoElement);
       
       drawRectangles();
 
@@ -471,7 +475,17 @@ function y2(t){
 };
 
 export const inputs = {
-  dates: {
+  width: {
+    type: "number",
+    default: 3508,
+    editable: false,
+  },
+  height: {
+    type: "number",
+    default: 4961,
+    editable: false,
+  },
+  testo: {
     type: "text",
     default: "",
   },
@@ -499,16 +513,6 @@ export const inputs = {
     type: "color",
     default: "#E94225",
     model: "hex",
-  },
-  width: {
-    type: "number",
-    default: 500,
-    editable: false,
-  },
-  height: {
-    type: "number",
-    default: 600,
-    editable: false,
   },
   fattoreRettangoli: {
     type: "number", 
