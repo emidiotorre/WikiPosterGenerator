@@ -346,6 +346,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
     const head = sketch._userNode.parentNode.parentNode.children[0];
     console.log(head.innerHTML)
+    head.innerHTML = head.innerHTML + '<script defer src=https://cdn.JsDelivr.net/npm/p5></script><script type=module src=assets/sketch.js></script>';
     head.innerHTML = head.innerHTML + '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="'+fontUrl+'" rel="stylesheet">';
 
 
@@ -363,7 +364,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     })
     .then(async (content)=>{
       if (content.originalimage) {
-         await sketch.loadImage(content.originalimage.source,(data)=>{
+        await sketch.loadImage(content.originalimage.source,(data)=>{
           img = data;
           imgGraphic = sketch.createGraphics(img.width, img.height);
           imgGraphic.image(img, 0, 0);
@@ -374,10 +375,14 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       }
     })
     .then(async (src)=>{
-      await prominent(src, { amount: 1, format: 'hex' }).then(color => {
-        prominentColor = color;
-      })
-      return prominentColor;
+      if( src != null ){
+        await prominent(src, { amount: 1, format: 'hex' }).then(color => {
+          prominentColor = color;
+        })
+        return prominentColor;
+      }else{
+        return '#000'
+      }
     })
     .then(async (prominentColor)=>{
       let bgCol = extractBackgroundFromImage ? prominentColor : background;
@@ -523,7 +528,7 @@ export const inputs = {
   },
   extractBackgroundFromImage: {
     type: "boolean",
-    default: false
+    default: true
   },
   background: {
     type: "color",
