@@ -1,4 +1,16 @@
-# Mechanic project
+# Generatore di Posters da pagine Wikipedia
+
+ è uno strumento sviluppato durante il workshop [Let's Make A Poster](https://www.lascuolaopensource.xyz/didattica/let-s-make-a-poster) coordinato da [La Scuola Open Source](https://lascuolaopensource.xyz/) e realizzato con il finanziamento di Wikimedia, [link al progetto](https://wiki.wikimedia.it/wiki/Bando_2021_per_progetti_dei_volontari/Proposte/Progetto_Wikiposter).
+
+Per la realizzazione dello strumento ci siamo avvalsi di [Mechanic Js](https://mechanic.design/) e [P5 Js](https://p5js.org/).
+
+Il codice è stato scritto con i partecipanti al workshop, ed è stato realizzato a scopo didattico.
+
+Abbiamo presvisto degli sviluppi futuri, come ad esempio l'importazione di sketch P5.js direttamente da files esterni, e la realizzazione di una pagina di documentazione.
+
+---
+
+# Mechanic.js commands
 
 If you haven't already, move your working directory to this project to run Mechanic commands:
 
