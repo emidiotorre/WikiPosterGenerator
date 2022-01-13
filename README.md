@@ -4,6 +4,8 @@
 
 Per la realizzazione dello strumento ci siamo avvalsi di [Mechanic Js](https://mechanic.design/) e [P5 Js](https://p5js.org/).
 
+![demo](https://s10.gifyu.com/images/ezgif-6-203ca57943.gif)
+
 Il codice è stato scritto con i partecipanti al workshop, ed è stato realizzato a scopo didattico.
 
 Abbiamo presvisto degli sviluppi futuri, come ad esempio l'importazione di sketch P5.js direttamente da files esterni, e la realizzazione di una pagina di documentazione.

@@ -506,12 +506,12 @@ export const inputs = {
   },
   color: {
     type: "color",
-    default: "#E94225",
+    default: "#87FF65",
     model: "hex",
   },
   textColor: {
     type: "color",
-    default: "#E94225",
+    default: "#2A2B2E",
     model: "hex",
   },
   fattoreRettangoli: {
@@ -520,7 +520,7 @@ export const inputs = {
     max: 500, 
     step: 5, 
     slider: true, 
-    default: 400 
+    default: 20 
   },
   numeroRettangoli: {
     type: "number", 
@@ -528,15 +528,15 @@ export const inputs = {
     max: 100, 
     step: 5, 
     slider: true, 
-    default: 400 
+    default: 20 
   },
   extractBackgroundFromImage: {
     type: "boolean",
-    default: true
+    default: false
   },
   background: {
     type: "color",
-    default: "#E94225",
+    default: "#ACEB98",
     model: "hex",
   },
 
